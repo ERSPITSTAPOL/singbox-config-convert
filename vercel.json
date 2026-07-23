@@ -1,0 +1,21 @@
+{
+  "regions": ["hnd1"],
+  "functions": {
+    "api/app.py": {
+      "maxDuration": 30
+    },
+    "api/index.py": {
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/config/(.*)",
+      "destination": "/api/app"
+    },
+    {
+      "source": "/",
+      "destination": "/api/index"
+    }
+  ]
+}

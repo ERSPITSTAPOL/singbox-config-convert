@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sing-box Sub Converter</title>
+    <link rel="icon" href="https://raw.githubusercontent.com/Toperlock/sing-box-subscribe/main/public/favicon.ico" type="image/x-icon">
+    <style>
+        :root {
+            --bg-color: #f5f7f9;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --border-color: #e0e4e8;
+            --primary-color: #007aff;
+            --accent-color: #34c759;
+            --danger-color: #ff3b30;
+
+            --btn-add-bg: #d4edda;
+            --btn-add-text: #155724;
+            --btn-add-border: #c3e6cb;
+
+            --btn-primary-bg: #cce5ff;
+            --btn-primary-text: #004085;
+            --btn-primary-border: #b8daff;
+
+            --btn-danger-bg: #f8d7da;
+            --btn-danger-text: #721c24;
+            --btn-danger-border: #f5c6cb;
+        }
+
+        .dark-mode {
+            --bg-color: #1a1a1a;
+            --card-bg: #2a2a2a;
+            --text-color: #f0f0f0;
+            --border-color: #444;
+            --primary-color: #0a84ff;
+            --accent-color: #32d74b;
+            --danger-color: #ff453a;
+
+            --btn-add-bg: #1e3a29;
+            --btn-add-text: #a8d5b2;
+            --btn-add-border: #274d35;
+
+            --btn-primary-bg: #1a365d;
+            --btn-primary-text: #90cdf4;
+            --btn-primary-border: #2a4365;
+
+            --btn-danger-bg: #4d1a1e;
+            --btn-danger-text: #ff9999;
+            --btn-danger-border: #662227;
+        }
+
+        body,
+        .card,
+        .combo-input,
+        input[type="text"],
+        button,
+        .sub-item {
+            transition: background-color 0.3s ease,
+            color 0.3s ease,
+            border-color 0.3s ease,
+            box-shadow 0.3s ease,
+            transform 0.3s ease;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        button, input, a, .combo-input, .select-trigger {
+            -webkit-tap-highlight-color: transparent;
+            outline: none !important;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        @media (max-width: 600px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header h2 {
+                margin: 0;
+            }
+
+            .controls {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .btn-ghost {
+                flex: 1;
+                padding: 12px 10px;
+                font-size: 14px;
+                min-width: 100px;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            box-sizing: border-box;
+        }
+
+        #global-settings .input-group {
+            margin-bottom: 10px;
+        }
+        #global-settings {
+            padding-bottom: 15px;
+        }
+
+        .sub-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .sub-header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sub-header h3 {
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        .sub-count {
+            background: var(--primary-color);
+            color: white;
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: bold;
+            min-width: 12px;
+            text-align: center;
+        }
+
+        .sub-item {
+            position: relative;
+            padding: 55px 20px 20px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            margin-bottom: 15px;
+            background: rgba(128, 128, 128, 0.02);
+            display: block;
+        }
+
+        .toggle-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle-wrapper span {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .emoji-toggle {
+            position: absolute;
+            top: 18px;
+            left: 20px;
+            z-index: 10;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 36px;
+            height: 20px;
+            margin: 0;
+            opacity: 1;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-color);
+            transition: .4s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(16px);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .form-grid .input-group {
+            margin-bottom: 0;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 15px;
+            position: relative;
+            min-width: 0;
+        }
+
+        label {
+            font-size: 12px;
+            margin-bottom: 4px;
+            opacity: 0.8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .combo-input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 14px; 
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-color);
+            box-sizing: border-box;
+            font-size: 14px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            margin-top: 4px;
+            z-index: 1000;
+            max-height: 250px;
+            overflow-y: auto;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .option-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 14px;
+        }
+
+        .option-item:hover {
+            background: rgba(128, 128, 128, 0.1);
+        }
+
+        .option-item.selected {
+            color: var(--primary-color);
+            font-weight: bold;
+            background: rgba(0, 122, 255, 0.08);
+        }
+
+        .select-trigger::after {
+            content: "";
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            width: 8px;
+            height: 8px;
+            border-right: 2px solid var(--text-color);
+            border-bottom: 2px solid var(--text-color);
+            transform: translateY(-70%) rotate(45deg);
+            opacity: 0.6;
+        }
+
+        button {
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .btn-add {
+            background: var(--btn-add-bg);
+            color: var(--btn-add-text);
+            border-color: var(--btn-add-border);
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--btn-primary-bg);
+            color: var(--btn-primary-text);
+            border-color: var(--btn-primary-border);
+            width: 100%;
+            font-size: 16px;
+        }
+
+        .delete-btn {
+            position: absolute;
+            top: 12px;
+            right: 15px;
+            background: var(--btn-danger-bg);
+            color: var(--btn-danger-text);
+            border-color: var(--btn-danger-border);
+            padding: 8px 16px;
+            border-radius: 16px;
+            z-index: 10;
+            font-size: 14px; 
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border-color: var(--border-color);
+            color: var(--text-color);
+            box-shadow: none;
+        }
+
+        .btn-add:hover, .btn-primary:hover, .delete-btn:hover {
+            filter: brightness(0.96);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .btn-ghost:hover {
+            background: rgba(128, 128, 128, 0.05);
+        }
+
+        .dark-mode .btn-add:hover, .dark-mode .btn-primary:hover, .dark-mode .delete-btn:hover {
+            filter: brightness(1.15);
+        }
+
+        #result-area {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .url-display {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 15px;
+            border-radius: 14px;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 13px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        input.combo-input:focus,
+        input[type="text"]:focus {
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.25);
+            outline: none;
+        }
+
+        #toast {
+            position: fixed;
+            top: 30px;
+            bottom: auto;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 10px 22px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            z-index: 9999;
+            white-space: nowrap;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        #toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .dark-mode #toast {
+            background: #1e3a29;
+            color: #a8d5b2;
+            border-color: #274d35;
+        }
+    </style>
+</head>
+
+<body class="dark-mode">
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        if (savedTheme === 'light') document.body.classList.remove('dark-mode');
+    </script>
+
+    <div id="data-templates" style="display: none;">
+        {% for option in template_options %}
+        <span class="template-opt" data-index="{{ loop.index }}" data-label="{{ option }}"></span>
+        {% endfor %}
+
+        <template id="sub-item-template">
+            <form class="sub-item" onsubmit="event.preventDefault();">
+                <div class="toggle-wrapper emoji-toggle">
+                    <label class="switch">
+                        <input type="checkbox" name="sub-emoji" class="sub-emoji">
+                        <span class="slider round"></span>
+                    </label>
+                    <span data-translate="label_emoji"></span>
+                </div>
+                <button type="button" class="delete-btn" data-translate="delete"></button>
+
+                <div class="input-group">
+                    <label data-translate="label_url"></label>
+                    <input type="text" name="sub-url" class="sub-url combo-input" placeholder="URL/URI" onfocus="this.select()">
+                </div>
+
+                <div class="input-group" style="margin-bottom: 15px;">
+                    <label data-translate="label_ua"></label>
+                    <input type="text" name="sub-ua" class="sub-ua combo-input" placeholder="sing-box" onfocus="this.select()">
+                </div>
+
+                <div class="form-grid">
+                    <div class="input-group">
+                        <label data-translate="label_suffix"></label>
+                        <input type="text" name="sub-suffix" class="sub-suffix combo-input" placeholder="Optional" onfocus="this.select()">
+                    </div>
+                    <div class="input-group">
+                        <label data-translate="label_prefix"></label>
+                        <input type="text" name="sub-prefix" class="sub-prefix combo-input" placeholder="Optional" onfocus="this.select()">
+                    </div>
+
+                    <div class="input-group">
+                        <label data-translate="label_enn"></label>
+                        <input type="text" name="sub-enn" class="sub-enn combo-input" placeholder="Optional" onfocus="this.select()">
+                    </div>
+                    <div class="input-group">
+                        <label data-translate="label_eps"></label>
+                        <input type="text" name="sub-eps" class="sub-eps combo-input" placeholder="Optional" onfocus="this.select()">
+                    </div>
+
+                    <div class="input-group">
+                        <label data-translate="label_tag"></label>
+                        <input type="text" name="sub-tag" class="sub-tag combo-input" placeholder="Optional" onfocus="this.select()">
+                    </div>
+                    <div class="input-group">
+                        <label data-translate="label_subgroup"></label>
+                        <input type="text" name="sub-subgroup" class="sub-subgroup combo-input" placeholder="Optional" onfocus="this.select()">
+                    </div>
+                </div>
+            </form>
+        </template>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h2 data-translate="title">Sing-box Sub Converter</h2>
+            <div class="controls">
+                <button class="btn-ghost" onclick="toggleLanguage()" data-translate="lang_btn">中文</button>
+                <button class="btn-ghost" onclick="toggleTheme()" data-translate="theme_btn">Toggle Theme</button>
+            </div>
+        </div>
+
+        <div class="card" id="global-settings">
+            <h3 data-translate="global_settings" style="margin-top: 0;">Global Settings</h3>
+
+            <div class="input-group">
+                <label data-translate="label_file">Template (Double-click to manual input)</label>
+                <div id="template-trigger" class="combo-input select-trigger" onclick="toggleDropdown(event, 'template-menu')" ondblclick="switchToInput()">Select Template...</div>
+                <div id="template-menu" class="dropdown-menu"></div>
+                <input type="text" id="template-manual" class="combo-input" style="display:none;" ondblclick="switchToSelect()" onfocus="this.select()" placeholder="Enter template index or URL">
+            </div>
+
+            <div class="input-group">
+                <label data-translate="label_gh">GitHub Proxy</label>
+                <div id="gh-trigger" class="combo-input select-trigger" onclick="toggleDropdown(event, 'gh-menu')">None (Do not modify)</div>
+                <div id="gh-menu" class="dropdown-menu"></div>
+            </div>
+
+            <div class="input-group" style="margin-bottom: 0; margin-top: 10px;">
+                <div class="toggle-wrapper">
+                    <label class="switch">
+                        <input type="checkbox" id="global-onlynodes">
+                        <span class="slider round"></span>
+                    </label>
+                    <span data-translate="label_onlynodes">Only-nodes</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="sub-header">
+                <div class="sub-header-left">
+                    <h3 data-translate="sub_list" style="margin-top: 0;">Subscription List</h3>
+                    <span id="sub-count-badge" class="sub-count">0</span>
+                </div>
+                <button class="btn-add" onclick="addSubBlock()" data-translate="add_sub">+ Add Subscription</button>
+            </div>
+            <div id="sub-container"></div>
+            <button class="btn-primary" onclick="generateURL()" data-translate="generate_btn">Generate Conversion URL</button>
+        </div>
+
+        <div id="result-area" class="card">
+            <h3 data-translate="result_title" style="margin-top: 0;">Generated URL</h3>
+            <div id="url-output" class="url-display"></div>
+            <button class="btn-add" style="width: 100%; font-size: 16px;" onclick="copyURL()" data-translate="copy_btn">Copy URL</button>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+        const i18n = {
+            zh: {
+                title: "Sing-box 订阅转换",
+                global_settings: "全局设置",
+                sub_list: "订阅列表",
+                add_sub: "+ 添加订阅",
+                generate_btn: "确认并生成转换链接",
+                lang_btn: "English",
+                theme_btn: "切换主题",
+                label_file: "模板文件",
+                label_gh: "GitHub 代理",
+                label_onlynodes: "仅节点",
+                label_url: "订阅地址",
+                label_tag: "标签",
+                label_subgroup: "分组",
+                label_prefix: "前缀",
+                label_suffix: "后缀",
+                label_enn: "排除名称",
+                label_eps: "排除协议",
+                label_ua: "自定义 UA",
+                label_emoji: "启用 emoji",
+                result_title: "生成的订阅链接",
+                copy_btn: "复制链接",
+                copy_msg: "链接已复制",
+                delete: "删除",
+                select_prompt: "请选择选项",
+                custom_input: "-- 自定义输入 --",
+                gh_none: "不修改"
+            },
+            en: {
+                title: "Sing-box Sub Converter",
+                global_settings: "Global Settings",
+                sub_list: "Subscription List",
+                add_sub: "+ Add Subscription",
+                generate_btn: "Generate Conversion URL",
+                lang_btn: "中文",
+                theme_btn: "Toggle Theme",
+                label_file: "Template Settings",
+                label_gh: "GitHub Proxy",
+                label_onlynodes: "Only-nodes",
+                label_url: "Subscription URL",
+                label_tag: "Tag",
+                label_subgroup: "Subgroup",
+                label_prefix: "Prefix",
+                label_suffix: "Suffix",
+                label_enn: "Exclude Nodes",
+                label_eps: "Exclude Protocols",
+                label_ua: "Custom UA",
+                label_emoji: "Enable Emoji",
+                result_title: "Generated URL",
+                copy_btn: "Copy URL",
+                copy_msg: "URL copied",
+                delete: "Delete",
+                select_prompt: "Select Option",
+                custom_input: "-- Custom Input --",
+                gh_none: "None (Do not modify)"
+            }
+        };
+
+        let currentLang = 'en';
+        let selectedTemplateValue = "1";
+        let selectedGHValue = "none";
+
+        let cachedTranslateElements = [];
+
+        const templateOptions = Array.from(document.querySelectorAll('.template-opt')).map(el => ({
+            value: el.getAttribute('data-index'),
+            label: el.getAttribute('data-label')
+        }));
+
+        const ghOptions = [
+            { value: "none", label: "None (Do not modify)" },
+            { value: "1", label: "gh-proxy" },
+            { value: "2", label: "cnxiaobai" },
+            { value: "3", label: "ghfast" },
+            { value: "4", label: "chenc" },
+            { value: "5", label: "jsDelivr" },
+            { value: "6", label: "jsDelivr-CF" },
+            { value: "7", label: "jsDelivr-Fastly" },
+            { value: "8", label: "jsdmirror" }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLang = localStorage.getItem('language');
+            if (savedLang) currentLang = savedLang;
+
+            cachedTranslateElements = Array.from(document.querySelectorAll('[data-translate]'));
+
+            initDropdowns();
+
+            document.getElementById('sub-container').addEventListener('click', function(e) {
+                if (e.target && e.target.classList.contains('delete-btn')) {
+                    const id = e.target.getAttribute('data-id');
+                    if (id) removeBlock(id);
+                }
+            });
+
+            addSubBlock();
+            updateLanguage();
+        });
+
+        function renderList(menuId, options, callback) {
+            const container = document.getElementById(menuId);
+            container.innerHTML = '';
+            options.forEach(opt => {
+                const item = document.createElement('div');
+                item.className = 'option-item';
+                item.setAttribute('data-value', opt.value);
+
+                let labelText = opt.label;
+                item.textContent = labelText;
+                item.onclick = (e) => {
+                    e.stopPropagation();
+                    callback(opt.value, item);
+                };
+                container.appendChild(item);
+            });
+        }
+
+        function updateDropdownSelection(menuId, selectedVal) {
+            const container = document.getElementById(menuId);
+            if (!container) return;
+            const items = container.querySelectorAll('.option-item');
+            items.forEach(item => {
+                if (String(item.getAttribute('data-value')) === String(selectedVal)) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        }
+
+        function initDropdowns() {
+            renderList('template-menu', [...templateOptions, { value: 'custom', label: i18n[currentLang].custom_input }], (val, element) => {
+                if (val === 'custom') {
+                    switchToInput();
+                } else {
+                    selectedTemplateValue = val;
+                    document.getElementById('template-trigger').textContent = element.textContent;
+                    updateDropdownSelection('template-menu', val);
+                }
+                hideAllDropdowns();
+            });
+
+            renderList('gh-menu', ghOptions, (val, element) => {
+                selectedGHValue = val;
+                document.getElementById('gh-trigger').textContent = element.textContent;
+                updateDropdownSelection('gh-menu', val);
+                hideAllDropdowns();
+            });
+            updateDropdownSelection('template-menu', selectedTemplateValue);
+            updateDropdownSelection('gh-menu', selectedGHValue);
+        }
+
+        function toggleDropdown(e, menuId) {
+            e.stopPropagation();
+            const menu = document.getElementById(menuId);
+            const isShow = menu.classList.contains('show');
+            hideAllDropdowns();
+            if (!isShow) {
+                menu.classList.add('show');
+                window.addEventListener('click', handleWindowClick);
+            }
+        }
+
+        function hideAllDropdowns() {
+            const menus = document.querySelectorAll('.dropdown-menu');
+            let closedAny = false;
+            menus.forEach(m => {
+                if (m.classList.contains('show')) {
+                    m.classList.remove('show');
+                    closedAny = true;
+                }
+            });
+            if (closedAny) {
+                window.removeEventListener('click', handleWindowClick);
+            }
+        }
+
+        function handleWindowClick() {
+            hideAllDropdowns();
+        }
+
+        function switchToInput() {
+            document.getElementById('template-trigger').style.display = 'none';
+            const input = document.getElementById('template-manual');
+            input.style.display = 'block';
+            input.focus();
+        }
+
+        function switchToSelect() {
+            document.getElementById('template-manual').style.display = 'none';
+            document.getElementById('template-trigger').style.display = 'block';
+        }
+
+        function updateSubCount() {
+            const count = document.getElementById('sub-container').children.length;
+            document.getElementById('sub-count-badge').textContent = count;
+        }
+
+        function addSubBlock() {
+            const container = document.getElementById('sub-container');
+            const template = document.getElementById('sub-item-template');
+            if (!template) return;
+
+            const clone = template.content.cloneNode(true);
+            const id = Date.now();
+
+            const subItem = clone.querySelector('.sub-item');
+            subItem.id = `block-${id}`;
+
+            const deleteBtn = clone.querySelector('.delete-btn');
+            deleteBtn.setAttribute('data-id', id);
+
+            const lang = i18n[currentLang];
+            const newTranslates = Array.from(clone.querySelectorAll('[data-translate]'));
+            newTranslates.forEach(el => {
+                const key = el.getAttribute('data-translate');
+                if (lang[key]) {
+                    el.textContent = lang[key];
+                }
+            });
+            container.appendChild(clone);
+            updateSubCount();
+            cachedTranslateElements.push(...newTranslates);
+        }
+
+        function removeBlock(id) {
+            document.getElementById(`block-${id}`)?.remove();
+            updateSubCount();
+            cachedTranslateElements = cachedTranslateElements.filter(el => el.isConnected);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(toast._timer);
+            toast._timer = setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        function generateURL() {
+            const baseURL = window.location.origin + "/config/";
+            const subItems = document.querySelectorAll('.sub-item');
+
+            let urls = [], emojis = [], tags = [], subgroups = [], prefixes = [], suffixes = [], enns = [], epss = [], uas = [];
+
+            subItems.forEach(item => {
+                const elements = item.elements;
+                const u = elements['sub-url'].value.trim();
+                if (u) {
+                    urls.push(u);
+                    emojis.push(elements['sub-emoji'].checked ? "1" : "0");
+                    tags.push(elements['sub-tag'].value.trim());
+                    subgroups.push(elements['sub-subgroup'].value.trim());
+                    prefixes.push(elements['sub-prefix'].value.trim());
+                    suffixes.push(elements['sub-suffix'].value.trim());
+                    enns.push(elements['sub-enn'].value.trim());
+                    epss.push(elements['sub-eps'].value.trim());
+                    uas.push(elements['sub-ua'].value.trim());
+                }
+            });
+
+            if (urls.length === 0) {
+                alert(currentLang === 'zh' ? "请填写订阅地址" : "Please enter URL");
+                return;
+            }
+
+            const params = [];
+            urls.forEach(u => {
+                params.push(`url=${encodeURIComponent(u)}`);
+            });
+
+            const shouldAddEmoji = !(urls.length === 1 && emojis[0] === "1");
+            if (shouldAddEmoji) {
+                params.push(`emoji=${encodeURIComponent(emojis.join('|'))}`);
+            }
+
+            const addEnc = (key, list) => {
+                if (list.some(val => val !== "")) {
+                    params.push(`${key}=${encodeURIComponent(list.join('|'))}`);
+                }
+            };
+
+            addEnc('tag', tags);
+            addEnc('subgroup', subgroups);
+            addEnc('prefix', prefixes);
+            addEnc('suffix', suffixes);
+            addEnc('enn', enns);
+            addEnc('eps', epss);
+            addEnc('UA', uas);
+
+            const manual = document.getElementById('template-manual');
+            const fileVal = (manual.style.display === 'block') ? manual.value.trim() : selectedTemplateValue;
+            if (fileVal && fileVal !== 'custom') params.push(`file=${encodeURIComponent(fileVal)}`);
+
+            if (selectedGHValue !== "none") params.push(`gh=${encodeURIComponent(selectedGHValue)}`);
+            if (document.getElementById('global-onlynodes').checked) params.push(`onlynodes=1`);
+
+            const resultURL = baseURL + "?" + params.join('&');
+
+            document.getElementById('url-output').textContent = resultURL;
+            document.getElementById('result-area').style.display = 'block';
+            document.getElementById('result-area').scrollIntoView({ behavior: 'smooth' });
+
+            navigator.clipboard.writeText(resultURL)
+                .then(() => showToast(i18n[currentLang].copy_msg))
+                .catch(() => {});
+        }
+
+        function copyURL() {
+            navigator.clipboard.writeText(document.getElementById('url-output').textContent)
+                .then(() => showToast(i18n[currentLang].copy_msg));
+        }
+
+        function toggleTheme() {
+            const isDark = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            localStorage.setItem('language', currentLang);
+            updateLanguage();
+        }
+
+        function updateLanguage() {
+            const lang = i18n[currentLang];
+
+            cachedTranslateElements.forEach(el => {
+                const key = el.getAttribute('data-translate');
+                if (lang[key]) el.textContent = lang[key];
+            });
+
+            const customOption = document.querySelector('#template-menu .option-item[data-value="custom"]');
+            if (customOption) {
+                customOption.textContent = lang.custom_input;
+            }
+
+            const ghNoneOption = document.querySelector('#gh-menu .option-item[data-value="none"]');
+            if (ghNoneOption) {
+                ghNoneOption.textContent = lang.gh_none;
+            }
+
+            if (selectedGHValue === 'none') {
+                document.getElementById('gh-trigger').textContent = lang.gh_none;
+            } else {
+                const ghOpt = ghOptions.find(o => String(o.value) === String(selectedGHValue));
+                if (ghOpt) document.getElementById('gh-trigger').textContent = ghOpt.label;
+            }
+
+            const trigger = document.getElementById('template-trigger');
+            const tmplOpt = templateOptions.find(o => String(o.value) === String(selectedTemplateValue));
+            if (trigger.style.display !== 'none') {
+                trigger.textContent = tmplOpt ? tmplOpt.label : lang.select_prompt;
+            }
+        }
+
+        window.addEventListener('load', function() {
+            fetch('/config/warmup', {
+                    method: 'GET',
+                    keepalive: true
+                })
+                .catch(function() {});
+        });
+    </script>
+</body>
+
+</html>
